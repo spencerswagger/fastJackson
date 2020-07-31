@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fcy.common.jackson.JsonProcessException;
-import com.fcy.common.jackson.Utils;
 import lombok.AllArgsConstructor;
+import lombok.val;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * @author fcy
@@ -36,12 +38,27 @@ public class StandardSerializer<T> extends JsonSerializer<T> implements Serializ
 
     @Override
     public Class<T> handledType() {
-        Class<T> type = handleType != null ? handleType : Utils.getRowType(this.getClass());
+        Class<T> type = handleType != null ? handleType : getRowType(this.getClass());
         if (type == null) {
             throw new JsonProcessException("unknown handled type of " + this
                 .getClass()
                 .getSimpleName());
         }
         return type;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> Class<T> getRowType(Class<?> clazz) {
+        try {
+            Type superClass = clazz.getGenericSuperclass();
+            val type = ((ParameterizedType)superClass).getActualTypeArguments()[0];
+            if (type instanceof ParameterizedType) {
+                return (Class<T>)((ParameterizedType)type).getRawType();
+            } else {
+                return (Class<T>)type;
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
