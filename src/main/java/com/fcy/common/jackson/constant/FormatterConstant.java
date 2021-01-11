@@ -32,6 +32,7 @@ public class FormatterConstant {
      */
     public static DateTimeFormatter LOCAL_DATE_TIME = new DateTimeFormatterBuilder()
         .append(LOCAL_DATE)
+        .optionalStart()
         .appendLiteral(' ')
         .append(LOCAL_TIME)
         .toFormatter();
@@ -53,6 +54,7 @@ public class FormatterConstant {
     public static DateTimeFormatter ISO_DATE_TIME = new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
         .append(ISO_DATE)
+        .optionalStart()
         .appendLiteral('T')
         .append(ISO_TIME)
         .toFormatter();
